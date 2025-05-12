@@ -1,5 +1,8 @@
+import e from "express"
 import { check, param, validationResult } from "express-validator"
 import { ObjectId } from "mongodb"
+
+//const db = req.app.locals.db
 
 // Middleware para verificar resultados da validação
 export const validateRequest = (req, res, next) => {
@@ -178,3 +181,45 @@ export const validateUpdateMunicipio = [
   validateRequest,
 ]
 
+//Validações do Usuário
+export const validateUsuario = [
+  check('nome')
+    .not().isEmpty().trim().withMessage('É obrigatório informar o nome')
+    .isAlpha('pt-br', { ignore: ' ' }).withMessage('O nome deve conter apenas letras')
+    .isLength({ min: 3 }).withMessage('O nome deve conter pelo menos 3 caracteres')
+    .isLength({ max: 100 }).withMessage('O nome deve ter no máximo 100 caracteres'),
+  check('email')
+    .not().isEmpty().trim().withMessage('É obrigatório informar o e-mail')
+    .isEmail().withMessage('O e-mail informado é inválido')
+    .isLowercase().withMessage('O e-mail deve estar em letras minúsculas')
+    /*
+    .custom((value, {}) => {
+      return db.collection('usuarios')
+        .find({ email: { $eq: value } }).toArray()
+        .then((email) => {
+          if (email.lenght) return Promise.reject('O e-mail informado ja esta cadastrado')
+        })
+    })
+    */,
+  check('senha')
+    .not().isEmpty().withMessage('A senha é obrigatória')
+    .isLength({ min: 8 }).withMessage('A senha deve conter pelo menos 8 caracteres')
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1
+    }).withMessage('A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial'),
+  check('ativo')
+    .default(true)
+    .isBoolean().withMessage('O campo ativo deve ser um booleano'),
+  check('tipo')
+    .default('Cliente')
+    .isIn(['Cliente', 'Admin']).withMessage('O tipo deve ser Admin ou Cliente'),
+  check('avatar')
+    .optional({ nullable: true })
+    .isURL().withMessage('A URL do Avatar é inválida'),
+  //Aplica as validações
+  validateRequest
+]
