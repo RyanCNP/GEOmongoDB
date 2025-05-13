@@ -10,8 +10,8 @@ Content-Type: application/json
     "nome": "Alberto Einstein",
     "email":"einstein@fatec.gov.br",
     "senha":"{{senha}}",
-    //"ativo": true,
-    //"tipo": "Cliente"
+    "ativo": true,
+    "tipo": "Cliente"
 }
 
 ###

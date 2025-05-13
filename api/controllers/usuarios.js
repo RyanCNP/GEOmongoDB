@@ -25,7 +25,7 @@ export const efetuaLogin = async (req, res) => {
         //Verifica se o email existe no MongoDB
         let usuario = await db.collection('usuarios').find({ email }).limit(1).toArray();
         //Se o array estiver vazio, é porque não tem...
-        if (!usuario.lenght()) {
+        if (!usuario.length()) {
             return res.status(404).json({
                 erros: [{
                     value: `${email}`,
@@ -33,9 +33,33 @@ export const efetuaLogin = async (req, res) => {
                     param: 'email'
                 }]
             });
-        }
+        };
+        //Verificando a senha...
+        const isMatch = await bcrypt.compare(senha, usuario[0].senha);
+        if (!isMatch) {
+            return res(403).json({//forbidden
+                errors: [{
+                    value: 'senha',
+                    msg: 'A senha informada está incorreta',
+                    param: 'senha'
+                }]
+            });
+        };
+        //Se tudo ok, iremos gerar o token JWT
+        jwt.sign(
+            { usuario: { i: usuario[0]._id } },
+            process.env.SECRET_KEY,
+            { expiresIn: 'process.env.EXPIRES_IN' },
+            (err, token) => {
+                if (err) throw err
+                res.status(200).json({
+                    acces_token: token,
+                    msg: 'Login efetuado com sucesso'
+                })
+            }
+        )
     } catch (e) {
         console.error(e);
     }
-    
+
 }

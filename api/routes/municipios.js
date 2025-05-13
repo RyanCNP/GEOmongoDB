@@ -8,11 +8,12 @@ deleteMunicipio,
 getMunicipiosByDistance
 } from "../controllers/municipios.js"
 import { validateMunicipio, validateUpdateMunicipio, validateObjectId } from "../middleware/validation.js"
+import auth from "../middleware/auth.js"
 
 const router = express.Router()
 
 // Get all municipios
-router.get("/", getMunicipios)
+router.get("/", auth, getMunicipios)
 
 // Get municipios by distance
 router.get("/nearby", getMunicipiosByDistance)
